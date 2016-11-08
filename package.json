@@ -1,17 +1,27 @@
 {
-  "name": "gifcities-slack",
+  "name": "gifcities-twitter-bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "twitter bot that tweets random gifs from gifcities.org geocities archive",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js",
+    "deploy": "now -e TWITTER_CONSUMER_KEY=@gif_consumer_key -e TWITTER_CONSUMER_SECRET=@gif_consumer_secret -e TWITTER_ACCESS_TOKEN_KEY=@gif_access_key -e TWITTER_ACCESS_TOKEN_SECRET=@gif_access_secret"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "gifs",
+    "geocities",
+    "images",
+    "twitter",
+    "archive"
+  ],
+  "author": "Axel Anderson",
+  "license": "MIT",
   "dependencies": {
+    "corpora-project": "https://github.com/llkats/corpora-project.git#node-modules-update",
     "cron": "^1.1.1",
+    "lodash.find": "^4.6.0",
+    "lodash.isobject": "^3.0.2",
+    "lodash.map": "^4.6.0",
     "nets": "^3.2.0",
     "random-item": "^1.0.0",
     "temp-write": "^2.1.0",

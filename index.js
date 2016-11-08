@@ -1,9 +1,13 @@
+const CronJob = require('cron').CronJob
+const Twitter = require('twitter')
+const corpora = require('corpora-project')
 const fs = require('fs')
 const nets = require('nets')
-const CronJob = require('cron').CronJob
 const random = require('random-item')
-const Twitter = require('twitter')
 const tempWrite = require('temp-write')
+const isObject = require('lodash.isobject')
+
+const getQuery = require('./lib/getQuery')
 
 const client = new Twitter({
   consumer_key: process.env.TWITTER_CONSUMER_KEY,
@@ -14,19 +18,26 @@ const client = new Twitter({
 
 const ROOT = 'https://gifcities.archive.org/api/v1/gifsearch?q='
 const PREFIX = 'https://web.archive.org/web/'
+const NO_RESULTS = '20090727153912/http://www.geocities.com/doiglahrnope/Penguins.gif'
 
+init()
 try {
   new CronJob('0 0,15,30,45 * * * *', function () {
-    init('lava lamp')
+    init()
   }, null, true)
-} catch(ex) {
+} catch (e) {
     console.error("cron pattern not valid");
 }
 
-function init (query) {
+function init () {
+  const query = getQuery()
+
+  console.log(`attempting to find a gif for ${query}`)
+
   getImageUrl(query)
     .then(downloadImage)
     .then(postTweet)
+    .catch(err => console.error(err.message))
 }
 
 function getImageUrl (query) {
@@ -37,8 +48,17 @@ function getImageUrl (query) {
     }, (err, res, body) => {
       if (err) return reject(err)
 
+      const parsed = JSON.parse(body)
+      const image = random(parsed).gif
+
+      if (isObject(query) || image === NO_RESULTS) {
+        reject(new Error('no results'))
+
+        console.log('retrying...')
+        return init()
+      }
       const result = {
-        url: PREFIX + random(JSON.parse(body)).gif,
+        url: PREFIX + image,
         query: query
       }
 
@@ -77,7 +97,7 @@ function postTweet (result) {
       }, (err, tweet, res) => {
         if (err) return console.error('post ', err)
 
-        console.log('success!')
+        console.log((new Date().toISOString()) + ': success!')
       })
     })
 

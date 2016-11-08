@@ -47,4 +47,4 @@ jspm_packages
 # Output of 'npm pack'
 *.tgz
 
-*.gif
+keys.sh
