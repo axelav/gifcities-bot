@@ -30,6 +30,7 @@ try {
 }
 
 function init () {
+  console.log('starting search...')
   const query = getQuery()
 
   console.log(`attempting to find a gif for ${query}`)
@@ -51,10 +52,10 @@ function getImageUrl (query) {
       const parsed = JSON.parse(body)
       const image = random(parsed).gif
 
-      if (isObject(query) || image === NO_RESULTS) {
-        reject(new Error('no results'))
+      if (!query || isObject(query) || image === NO_RESULTS) {
+        reject(new Error('rejected'))
 
-        console.log('retrying...')
+        console.log('no results. retrying...')
         return init()
       }
       const result = {
