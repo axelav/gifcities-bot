@@ -9,6 +9,8 @@ const isObject = require('lodash.isobject')
 
 const getQuery = require('./lib/getQuery')
 
+const isArray = Array.isArray
+
 const client = new Twitter({
   consumer_key: process.env.TWITTER_CONSUMER_KEY,
   consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
@@ -20,7 +22,6 @@ const ROOT = 'https://gifcities.archive.org/api/v1/gifsearch?q='
 const PREFIX = 'https://web.archive.org/web/'
 const NO_RESULTS = '20090727153912/http://www.geocities.com/doiglahrnope/Penguins.gif'
 
-init()
 try {
   new CronJob('0 0,15,30,45 * * * *', function () {
     init()
@@ -50,20 +51,25 @@ function getImageUrl (query) {
       if (err) return reject(err)
 
       const parsed = JSON.parse(body)
+
+      if (!query || isObject(query) || !parsed || !isArray(parsed)) return retry()
+
       const image = random(parsed).gif
 
-      if (!query || isObject(query) || image === NO_RESULTS) {
-        reject(new Error('rejected'))
+      if (image === NO_RESULTS) return retry()
 
-        console.log('no results. retrying...')
-        return init()
-      }
       const result = {
         url: PREFIX + image,
         query: query
       }
 
       resolve(result)
+
+      function retry () {
+        reject(new Error('rejected'))
+        console.log('no results. retrying...')
+        return init()
+      }
     })
   })
 }
