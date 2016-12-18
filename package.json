@@ -18,7 +18,7 @@
   "license": "MIT",
   "dependencies": {
     "corpora-project": "https://github.com/llkats/corpora-project.git#node-modules-update",
-    "cron": "^1.1.1",
+    "cron": "^1.2.1",
     "lodash.find": "^4.6.0",
     "lodash.isobject": "^3.0.2",
     "lodash.map": "^4.6.0",
